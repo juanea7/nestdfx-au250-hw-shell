@@ -48,5 +48,5 @@ There is a separate software template for the userspace side. It uses the same s
 
 ## Troubleshooting
 
-- If a build fails, first check the module names in `s/syn_reconfig.tcl` and the Vivado block design wiring.
+- If a build fails, first check the module names in `scripts/syn_reconfig.tcl` and the Vivado block design wiring.
 - If addresses do not match, compare the generated project against the diagrams in `images/` before changing the software side.
