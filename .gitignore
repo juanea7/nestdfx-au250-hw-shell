@@ -37,3 +37,4 @@
 *.tmpCRC
 *.dat
 *.plot
+!implementation_A0/top_static/top_A0_locked.dcp
