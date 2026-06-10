@@ -4,6 +4,7 @@
 */hd_visual
 */prj
 /vitis_WS
+bin/*
 
 # Ignore object files and dependent files
 .o
@@ -38,3 +39,4 @@
 *.dat
 *.plot
 !implementation_A0/top_static/top_A0_locked.dcp
+!bin/.gitkeep
