@@ -42,14 +42,14 @@ if { [string first $scripts_vivado_version $current_vivado_version] == -1 } {
 
 set list_projs [get_projects -quiet]
 if { $list_projs eq "" } {
-   create_project reconfig ./reconfig_prj -part xcu250-figd2104-2L-e
+   create_project project_1 myproj -part xcu250-figd2104-2L-e
    set_property BOARD_PART xilinx.com:au250:part0:1.3 [current_project]
 }
 
 
 # CHANGE DESIGN NAME HERE
 variable design_name
-set design_name reconfig_base_inst_bd
+set design_name reconfig_base_inst
 
 # If you do not already have an existing IP Integrator design open,
 # you can create a design using the following command:
@@ -257,13 +257,6 @@ proc create_root_design { parentCell } {
    CONFIG.ADDR_WIDTH {32} \
    CONFIG.DATA_WIDTH {32} \
    CONFIG.PROTOCOL {AXI4} \
-   CONFIG.ARUSER_WIDTH {0} \
-   CONFIG.AWUSER_WIDTH {0} \
-   CONFIG.RUSER_WIDTH {0} \
-   CONFIG.WUSER_WIDTH {0} \
-   CONFIG.BUSER_WIDTH {0} \
-   CONFIG.RUSER_BITS_PER_BYTE {0} \
-   CONFIG.WUSER_BITS_PER_BYTE {0} \
    ] $M00_AXI_0
 
 
@@ -379,20 +372,5 @@ proc create_root_design { parentCell } {
 ##################################################################
 
 create_root_design ""
-
-set bd_file [get_files reconfig_base_inst_bd.bd]
-
-set_property REGISTERED_WITH_MANAGER "1" $bd_file
-set_property SYNTH_CHECKPOINT_MODE "Hierarchical" $bd_file
-
-set bd_wrapper_path [make_wrapper -fileset sources_1 -files $bd_file -top]
-add_files -norecurse -fileset sources_1 $bd_wrapper_path
-
-# Add the fixed DFX top-level wrapper
-add_files -norecurse -fileset sources_1 \
-    [file normalize [file join $script_folder ../source/hdl/reconfig_base_inst.vhd]]
-
-# Make the fixed wrapper the actual top
-set_property top reconfig_base_inst [get_filesets sources_1]
 
 

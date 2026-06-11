@@ -32,8 +32,7 @@ This runs `dfx_prj`, `synthesis` and `implementation_A1` to produce the final `.
 
 ## How to adapt the reconfigurable project
 
-- Use `scripts/project_gen_reconfig.tcl` to create the user project, then open it in Vivado, modify the reconfigurable logic graphically and export the project TCL if you want a reproducible scripted flow.
-- Update `scripts/syn_reconfig.tcl` so the `launch_runs` and `wait_on_run` entries match the module runs produced by your design.
+- Use `scripts/project_gen_reconfig.tcl` to create the user project, then open it in Vivado, modify the reconfigurable logic graphically and export the project TCL if you want a reproducible scripted flow. Note a series of modifications will be required (check [scripts/README.md](scripts/README.md)).
 - Keep the shell-facing hardware contract stable. The user logic can change, but the ports and reserved address windows expected by the shell should not.
 
 ## Hardware contract
@@ -44,9 +43,8 @@ The shell address windows are predefined, so software and hardware must use the 
 
 ## Companion software
 
-There is a separate software template for the userspace side. It uses the same shell contract, address map and bitstream flow, so any hardware change here should be reflected there as well.
+There is a separate software template for the userspace side in [this repo](https://github.com/juanea7/nestdfx-au250-sw-template). It uses the same shell contract, address map and bitstream flow, so any hardware change here should be reflected there as well.
 
 ## Troubleshooting
 
-- If a build fails, first check the module names in `scripts/syn_reconfig.tcl` and the Vivado block design wiring.
 - If addresses do not match, compare the generated project against the diagrams in `images/` before changing the software side.
