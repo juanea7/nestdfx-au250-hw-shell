@@ -1,61 +1,61 @@
-# DDR Pointer-Model HLS Example
+# `ddr_scale_hls` accelerator example
 
-This folder contains a minimal HLS accelerator and testbench for the
-"Option 2" architecture:
+This is an HLS-based reconfigurable module for the A1 region.
 
-- AXI4-Lite slave for control
-- AXI4 master for DDR reads/writes
-- host CPU uses XDMA to fill/read DDR buffers
+The accelerator implements a simple DDR scaler. The host writes input data to DDR through XDMA, the HLS accelerator reads it through its `m_axi` interface, scales the data, writes the result back to DDR, and the host reads the output through XDMA.
 
-The example kernel performs:
+## Architecture
 
-- `out[i] = in[i] * scale` for `i in [0, length)`
+```text
+Host
+↓ XDMA
+DDR
+↓
+HLS Accelerator inside A1
+├─ AXI-Lite control
+└─ m_axi DDR master
+↓
+DDR
+↓ XDMA
+Host
+```
 
 ## Files
 
-- `src/ddr_scale_accel.h`: kernel declaration
-- `src/ddr_scale_accel.cpp`: HLS kernel implementation and pragmas
-- `tb/ddr_scale_accel_tb.cpp`: C testbench for pre-integration validation
-- `run_hls.tcl`: Vitis HLS script (`csim`, `csynth`, IP export)
+- `project_gen_reconfig.tcl`: Vivado project-generation script for this accelerator.
+- `hls/`: HLS source, testbench, scripts and exported IP.
 
-## Interface contract (migration-ready)
+## HLS IP catalog
 
-The kernel is intentionally written so it can be dropped into the current
-hardware template flow:
+This accelerator uses an HLS-generated IP. The exported HLS IP must be added to the Vivado IP catalog inside `project_gen_reconfig.tcl` before the block design checks or IP instantiation steps.
 
-- `s_axilite bundle=control`
-  - `in_ddr` pointer register
-  - `out_ddr` pointer register
-  - `length`
-  - `scale`
-  - `ap_start/ap_done/ap_idle/ap_ready` (`ap_ctrl_hs` via return port)
+The project-generation script should include the HLS export directory as an IP repository, for example:
 
-- `m_axi bundle=gmem`
-  - single AXI4 master bundle shared by input and output pointers
-  - fits the shell-side single AXI full master style
-
-## Run local C simulation (quick check)
-
-```bash
-g++ -std=c++11 -O2 -Wall -Wextra -I./src src/ddr_scale_accel.cpp tb/ddr_scale_accel_tb.cpp -o ddr_scale_tb
-./ddr_scale_tb
+```tcl
+set_property ip_repo_paths [list [file normalize "$script_folder/hls/export"]] [current_project]
+update_ip_catalog
 ```
 
-## Run Vitis HLS
+Adjust the path if the exported IP is stored somewhere else.
+
+Without adding the HLS IP repository to the catalog, Vivado will not be able to instantiate the accelerator IP in the generated block design.
+
+## Build
+
+From the repository root:
 
 ```bash
-vitis_hls -f run_hls.tcl
+make ACCEL=ddr_scale_hls -j8
 ```
 
-By default, `run_hls.tcl` targets part `xcu250-figd2104-2L-e` and creates
-an IP catalog export after synthesis.
+If the HLS source has changed, regenerate the exported HLS IP before running the DFX build.
 
-## How this maps to software
+## Software
 
-At runtime, software should:
+The matching software example is expected to be built from the companion software repository with:
 
-1. write input data to a DDR buffer through XDMA,
-2. program kernel AXI-Lite registers (`in_ddr`, `out_ddr`, `length`, `scale`),
-3. set `ap_start`,
-4. poll `ap_done` (or wire interrupt later),
-5. read output DDR buffer through XDMA.
+```bash
+make APP=ddr_scale_hls
+```
+
+The software should configure the HLS control registers through AXI-Lite and use the DDR input/output addresses expected by this design.

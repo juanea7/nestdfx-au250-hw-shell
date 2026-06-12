@@ -1,11 +1,28 @@
-This folder contains the static shell artifacts for the A0 region of the design.
+# Static shell implementation
 
-## Key file
+This folder contains the pre-built static shell artifacts used by the DFX flow.
 
-- [top_static/top_A0_locked.dcp](top_static/top_A0_locked.dcp#L1): the placed-and-routed DCP for the static shell.
+The main artifact is the locked static design checkpoint:
 
-## Notes
+```text
+top_static/top_A0_locked.dcp
+```
 
-- The DCP is tied to a specific device and Vivado configuration, so replace it only if you are intentionally rebuilding the shell.
-- The user normally does not edit the shell. Instead, adapt the reconfigurable project so it fits the shell-facing AXI, interrupt and address contract.
-- Use [shell_block_diagram.png](../images/shell_block_diagram.png) and [shell_address_map.png](../images/shell_address_map.png) as the source of truth for shell wiring and reserved ranges.
+This DCP represents the static A0 shell. The A1 reconfigurable modules are implemented against this fixed shell.
+
+## How it is used
+
+When building a reconfigurable module with:
+
+```bash
+make ACCEL=<name>
+```
+
+the flow reuses the static shell DCP from this folder and implements the selected A1 reconfigurable design against it.
+
+## Practical rules
+
+- Researchers creating new accelerators should not normally modify this folder.
+- New accelerators should be added under `accelerators/<ACCEL>/`.
+- The static shell should only be regenerated when intentionally changing the platform infrastructure.
+- If the static shell changes, the address maps, wrapper contract and software assumptions must be checked again.

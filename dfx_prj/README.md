@@ -1,24 +1,49 @@
-This folder contains the Vivado project generation flow for the reconfigurable design.
+# Vivado DFX project generation
+
+This folder contains the Vivado project generation step for the selected reconfigurable module.
+
+The project-generation TCL is selected from:
+
+```text
+../accelerators/<ACCEL>/project_gen_reconfig.tcl
+```
 
 ## How to run
 
-- From the repo root:
+From the repository root:
 
 ```bash
-make vivado_dfx_proj -j8
+make ACCEL=timer_bram vivado_dfx_proj -j8
 ```
 
-- Or from this folder:
+or:
 
 ```bash
-make -C dfx_prj all
-# or
-./run.sh
+make ACCEL=ddr_scale_hls vivado_dfx_proj -j8
 ```
+
+From this folder:
+
+```bash
+make ACCEL=timer_bram
+```
+
+The `ACCEL` variable must match one of the folders under `accelerators/`.
 
 ## What it does
 
-- Executes `scripts/project_gen_reconfig.tcl` (or the project TCL present in this folder) to create a Vivado project.
-- The generated project is the one you should open in Vivado if you want to manually change the reconfigurable hardware or export the project TCL for reproducible scripted flows.
+The flow runs the selected accelerator TCL and creates the Vivado project in:
 
-If you edit the block design in Vivado, export the project TCL and replace `scripts/project_gen_reconfig.tcl` with that exported TCL so the automated flow matches your GUI changes.
+```text
+dfx_prj/reconfig_prj/
+```
+
+That generated project can be opened in Vivado to inspect or modify the reconfigurable hardware.
+
+If you modify the block design in Vivado and want the change to be reproducible, export the updated TCL and place it back in the corresponding accelerator folder:
+
+```text
+accelerators/<ACCEL>/project_gen_reconfig.tcl
+```
+
+Do not replace the common DFX scripts unless you are changing the shared shell flow.
