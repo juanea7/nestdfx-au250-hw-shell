@@ -390,7 +390,7 @@ add_files -norecurse -fileset sources_1 $bd_wrapper_path
 
 # Add the fixed DFX top-level wrapper
 add_files -norecurse -fileset sources_1 \
-    [file normalize [file join $script_folder ../source/hdl/reconfig_base_inst.vhd]]
+    [file normalize [file join $script_folder ../../source/hdl/reconfig_base_inst.vhd]]
 
 # Make the fixed wrapper the actual top
 set_property top reconfig_base_inst [get_filesets sources_1]
